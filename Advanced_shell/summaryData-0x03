@@ -6,11 +6,6 @@ output_file="pokemon_report.csv"
 # Initialize CSV file with headers
 echo "Name,Height,Weight" > "$output_file"
 
-# Variables to calculate totals for average height and weight
-total_height=0
-total_weight=0
-count=0
-
 # Loop through all JSON files
 for json_file in *.json; do
   # Extract Pokémon name, height, and weight using jq
@@ -20,18 +15,10 @@ for json_file in *.json; do
   
   # Add extracted data to the CSV file
   echo "$name,$height,$weight" >> "$output_file"
-  
-  # Update totals for average calculation
-  total_height=$(echo "$total_height + $height" | bc)
-  total_weight=$(echo "$total_weight + $weight" | bc)
-  count=$((count + 1))
 done
 
-# Calculate average height and weight using awk
-average_height=$(echo "scale=2; $total_height / $count" | bc)
-average_weight=$(echo "scale=2; $total_weight / $count" | bc)
+# Use awk to calculate the average height and weight of all Pokémon
+awk -F, 'NR > 1 {height+=$2; weight+=$3; count++} END {print "Average Height: " height/count ", Average Weight: " weight/count}' "$output_file"
 
-# Append average height and weight to the CSV file
-echo "Average,$average_height,$average_weight" >> "$output_file"
-
+# Output to show that the report was generated
 echo "Report generated: $output_file"
