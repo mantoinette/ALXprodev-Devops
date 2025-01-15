@@ -26,5 +26,4 @@ output=$(echo "$output" | sed -E "s/^([a-z])/\U\1/; s/(type )([a-z])/\1\u\2/")
 # Output the formatted result
 echo "$output"
 
-# Save the formatted output to a file
-echo "$output" > pokemon_summary.txt
+
