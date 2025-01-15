@@ -1,40 +1,29 @@
 #!/bin/bash
 
-# Define the list of Pokémon (case-sensitive check)
-pokemon_list=("Bulbasaur" "Ivysaur" "Venusaur" "Charmander" "Charmeleon")
+# Ensure the JSON file exists
+if [ ! -f data.json ]; then
+  echo "Error: JSON file 'data.json' not found. Please run the previous script to fetch the data."
+  exit 1
+fi
 
-# Base URL for the Pokémon API
-base_url="https://pokeapi.co/api/v2/pokemon"
+# Extract values from the JSON file using jq
+name=$(jq -r '.name' data.json)               # Pokémon's name
+height=$(jq -r '.height' data.json)           # Pokémon's height (in decimeters)
+weight=$(jq -r '.weight' data.json)           # Pokémon's weight (in hectograms)
+type=$(jq -r '.types[0].type.name' data.json) # Pokémon's primary type
 
-# Delay between API requests (in seconds)
-delay=2
+# Convert height and weight to human-readable format
+formatted_height=$(awk "BEGIN {printf \"%.1f\", $height / 10}")  # Convert height to meters
+formatted_weight=$(awk "BEGIN {printf \"%.0f\", $weight / 10}")  # Convert weight to kilograms
 
-# Loop through each Pokémon in the list
-for pokemon in "${pokemon_list[@]}"; do
-  # Convert the Pokémon name to lowercase to match API requirements
-  pokemon_lower=$(echo "$pokemon" | tr '[:upper:]' '[:lower:]')
+# Format the output string
+output="$name is of type $type, weighs ${formatted_weight}kg, and is ${formatted_height}m tall."
 
-  # Construct the API URL
-  api_url="$base_url/$pokemon_lower"
+# Use sed to adjust the formatting as required:
+# 1. Capitalize the first letter of the name and type.
+output=$(echo "$output" | sed -E "s/^([a-z])/\U\1/; s/(type )([a-z])/\1\u\2/")
 
-  # Fetch the data using curl
-  echo "Fetching data for $pokemon..."
-  response=$(curl -s "$api_url")
+# Output the formatted result
+echo "$output"
 
-  # Check if the response is valid
-  if [[ -z "$response" ]]; then
-    echo "Error: No data returned for $pokemon. Skipping..."
-    continue
-  fi
 
-  # Save the response to a file named after the Pokémon
-  output_file="${pokemon_lower}.json"
-  echo "$response" > "$output_file"
-  echo "Data for $pokemon saved to $output_file."
-
-  # Wait to avoid hitting rate limits
-  echo "Waiting for $delay seconds before the next request..."
-  sleep $delay
-done
-
-echo "All Pokémon data has been fetched and saved."
