@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Define the list of Pokémon (ensure these names are in lowercase)
+# Define the list of Pokémon in lowercase
 pokemon_list=("bulbasaur" "ivysaur" "venusaur" "charmander" "charmeleon")
 
 # Base URL for the Pokémon API
@@ -24,7 +24,7 @@ for pokemon in "${pokemon_list[@]}"; do
     continue
   fi
 
-  # Save the response to a file named after the Pokémon
+  # Save the response to a file named after the Pokémon (in lowercase)
   output_file="${pokemon}.json"
   echo "$response" > "$output_file"
   echo "Data for $pokemon saved to $output_file."
