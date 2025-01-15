@@ -17,6 +17,9 @@ for file in *.json; do
   echo "$name,$height,$weight" >> "$csv_file"
 done
 
+# Use sed to clean the data in the CSV if needed (for example, remove empty lines)
+sed -i '/^$/d' "$csv_file"  # Remove any empty lines
+
 # Calculate the average height and weight using awk
 awk -F, '
 BEGIN {
