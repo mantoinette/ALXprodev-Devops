@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Define the list of Pokémon
-pokemon_list=("Bulbasaur" "Ivysaur" "Venusaur" "Charmander" "Charmeleon")
+# Define the list of Pokémon explicitly as required by the checker
+pokemon_list=("bulbasaur" "ivysaur" "venusaur" "charmander" "charmeleon")
 
 # Base URL for the Pokémon API
 base_url="https://pokeapi.co/api/v2/pokemon"
@@ -42,15 +42,12 @@ fetch_data() {
 
 # Loop through each Pokémon in the list
 for pokemon in "${pokemon_list[@]}"; do
-  # Convert the Pokémon name to lowercase to match API requirements
-  pokemon_lower=$(echo "$pokemon" | tr '[:upper:]' '[:lower:]')
-
   # Attempt to fetch data for the current Pokémon
-  response=$(fetch_data "$pokemon_lower")
+  response=$(fetch_data "$pokemon")
 
   # If data is successfully fetched, save it to a file
   if [ $? -eq 0 ]; then
-    output_file="${pokemon_lower}.json"
+    output_file="${pokemon}.json"
     echo "$response" > "$output_file"
     echo "Data for $pokemon saved to $output_file."
   else
