@@ -16,8 +16,12 @@ type=$(jq -r '.types[0].type.name' data.json) # Pokémon's primary type
 formatted_height=$(awk "BEGIN {printf \"%.1f\", $height / 10}")  # Convert height to meters
 formatted_weight=$(awk "BEGIN {printf \"%.0f\", $weight / 10}")  # Convert weight to kilograms
 
-# Format the output exactly as required
-output="${name^} is of type ${type^}, weighs ${formatted_weight}kg, and is ${formatted_height}m tall."
+# Format the output string
+output="$name is of type $type, weighs ${formatted_weight}kg, and is ${formatted_height}m tall."
+
+# Use sed to adjust the formatting as required:
+# 1. Capitalize the first letter of the name and type.
+output=$(echo "$output" | sed -E "s/^([a-z])/\U\1/; s/(type )([a-z])/\1\u\2/")
 
 # Output the formatted result
 echo "$output"
