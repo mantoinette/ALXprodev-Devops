@@ -1,0 +1,53 @@
+#!/bin/bash
+
+# Define the list of Pokémon
+pokemon_list=("Bulbasaur" "Ivysaur" "Venusaur" "Charmander" "Charmeleon")
+
+# Base URL for the Pokémon API
+base_url="https://pokeapi.co/api/v2/pokemon"
+
+# Delay between API requests (in seconds)
+delay=2
+
+# Function to fetch Pokémon data
+fetch_pokemon_data() {
+  pokemon=$1
+  pokemon_lower=$(echo "$pokemon" | tr '[:upper:]' '[:lower:]')
+  api_url="$base_url/$pokemon_lower"
+  output_file="${pokemon_lower}.json"
+
+  echo "Fetching data for $pokemon..."
+  
+  # Retry logic for failed requests
+  attempt=1
+  max_attempts=3
+  while [ $attempt -le $max_attempts ]; do
+    response=$(curl -s "$api_url")
+    
+    if [[ -z "$response" ]]; then
+      echo "Error: No data returned for $pokemon (attempt $attempt). Retrying..."
+      ((attempt++))
+      sleep $delay
+    else
+      echo "$response" > "$output_file"
+      echo "Data for $pokemon saved to $output_file."
+      break
+    fi
+  done
+  
+  if [ $attempt -gt $max_attempts ]; then
+    echo "Failed to fetch data for $pokemon after $max_attempts attempts."
+  fi
+}
+
+# Loop through each Pokémon in the list and fetch data in parallel
+for pokemon in "${pokemon_list[@]}"; do
+  fetch_pokemon_data "$pokemon" &
+  # Delay between starting the background requests to avoid overwhelming the system
+  sleep 1
+done
+
+# Wait for all background processes to complete
+wait
+
+echo "All Pokémon data has been fetched and saved."
