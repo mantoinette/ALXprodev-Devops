@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Define the list of Pokémon (in lowercase format)
+# Define the list of Pokémon (ensure these names are in lowercase)
 pokemon_list=("bulbasaur" "ivysaur" "venusaur" "charmander" "charmeleon")
 
 # Base URL for the Pokémon API
