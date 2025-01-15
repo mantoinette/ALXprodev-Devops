@@ -40,17 +40,28 @@ fetch_pokemon_data() {
   fi
 }
 
+# Store background job PIDs to manage them later
+pids=()
+
 # Loop through each Pokémon in the list and fetch data in parallel
 for pokemon in "${pokemon_list[@]}"; do
   fetch_pokemon_data "$pokemon" &
+  # Get the PID of the last background process
+  pids+=($!)
   # Delay between starting the background requests to avoid overwhelming the system
   sleep 1
 done
 
-# Wait for all background jobs to finish using `wait`
-wait
+# Wait for all background jobs to finish
+for pid in "${pids[@]}"; do
+  wait "$pid"
+done
 
-# List all background jobs to check if any are still running
-jobs -l
+# After all processes have finished, you can kill any remaining background processes if needed
+# Example of killing a specific background process (uncomment to use)
+# for pid in "${pids[@]}"; do
+#   kill "$pid"
+# done
 
+# Check if all jobs have completed successfully
 echo "All Pokémon data has been fetched and saved."
