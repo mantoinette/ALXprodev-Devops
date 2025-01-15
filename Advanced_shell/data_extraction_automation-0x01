@@ -6,25 +6,21 @@ if [ ! -f data.json ]; then
   exit 1
 fi
 
-# Use `jq` to extract the name, height, weight, and type
-name=$(jq -r '.name' data.json)               # Extract the Pokémon's name
-height=$(jq -r '.height' data.json)           # Extract the Pokémon's height
-weight=$(jq -r '.weight' data.json)           # Extract the Pokémon's weight
-type=$(jq -r '.types[0].type.name' data.json) # Extract the first type of the Pokémon
+# Extract values from the JSON file using jq
+name=$(jq -r '.name' data.json)               # Pokémon's name
+height=$(jq -r '.height' data.json)           # Pokémon's height (in decimeters)
+weight=$(jq -r '.weight' data.json)           # Pokémon's weight (in hectograms)
+type=$(jq -r '.types[0].type.name' data.json) # Pokémon's primary type
 
 # Convert height and weight to human-readable format
-height_m=$(awk "BEGIN {printf \"%.1f\", $height / 10}")  # Convert height to meters
-weight_kg=$(awk "BEGIN {printf \"%.0f\", $weight / 10}") # Convert weight to kilograms
+formatted_height=$(awk "BEGIN {printf \"%.1f\", $height / 10}")  # Convert height to meters
+formatted_weight=$(awk "BEGIN {printf \"%.0f\", $weight / 10}")  # Convert weight to kilograms
 
-# Format the output string
-output="$name is of type $type, weighs ${weight_kg}kg, and is ${height_m}m tall."
+# Format the output exactly as required
+output="${name^} is of type ${type^}, weighs ${formatted_weight}kg, and is ${formatted_height}m tall."
 
-# Use `sed` to adjust the output to meet any formatting requirements
-# Example: Capitalize the first letter of the name and type
-output=$(echo "$output" | sed -E "s/^([a-z])/\U\1/; s/(type )([a-z])/\1\u\2/")
-
-# Display the final output
+# Output the formatted result
 echo "$output"
 
-# Save the formatted output to a file for reference
+# Save the formatted output to a file
 echo "$output" > pokemon_summary.txt
