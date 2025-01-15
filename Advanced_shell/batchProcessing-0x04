@@ -17,7 +17,7 @@ fetch_pokemon_data() {
   output_file="${pokemon_lower}.json"
 
   echo "Fetching data for $pokemon..."
-  
+
   # Retry logic for failed requests
   attempt=1
   max_attempts=3
@@ -34,7 +34,7 @@ fetch_pokemon_data() {
       break
     fi
   done
-  
+
   if [ $attempt -gt $max_attempts ]; then
     echo "Failed to fetch data for $pokemon after $max_attempts attempts."
   fi
@@ -47,7 +47,10 @@ for pokemon in "${pokemon_list[@]}"; do
   sleep 1
 done
 
-# Wait for all background processes to complete
+# Wait for all background jobs to finish using `wait`
 wait
+
+# List all background jobs to check if any are still running
+jobs -l
 
 echo "All Pokémon data has been fetched and saved."
