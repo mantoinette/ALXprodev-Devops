@@ -6,23 +6,19 @@ if [ ! -f data.json ]; then
   exit 1
 fi
 
-# Use `jq` to extract the name, height, weight, and type
-# `jq` parses the JSON file, and we retrieve the fields we need.
+# Use `jq` to extract the Pokémon's name, height, weight, and type
 name=$(jq -r '.name' data.json)               # Extract the Pokémon's name
 height=$(jq -r '.height' data.json)           # Extract the Pokémon's height
 weight=$(jq -r '.weight' data.json)           # Extract the Pokémon's weight
 type=$(jq -r '.types[0].type.name' data.json) # Extract the first type of the Pokémon
 
 # Convert height and weight to human-readable format
-# Pokémon API reports height in decimeters and weight in hectograms.
-# We'll convert them to meters and kilograms respectively.
-height_m=$(awk "BEGIN {printf \"%.1f\", $height / 10}")  # Convert height to meters
-weight_kg=$(awk "BEGIN {printf \"%.0f\", $weight / 10}") # Convert weight to kilograms
+formatted_height=$(awk "BEGIN {printf \"%.1f\", $height / 10}")  # Convert height to meters
+formatted_weight=$(awk "BEGIN {printf \"%.0f\", $weight / 10}") # Convert weight to kilograms
 
-# Format and display the output
-# Combine the extracted information into a sentence using `sed` for final formatting.
-output="${name^} is of type ${type^}, weighs ${weight_kg}kg, and is ${height_m}m tall."
+# Format the output to match the required human-readable format
+output="${name^} is of type ${type^}, weighs ${formatted_weight}kg, and is ${formatted_height}m tall."
+
+# Display and save the output
 echo "$output"
-
-# Save the formatted output to a file for reference
 echo "$output" > pokemon_summary.txt
